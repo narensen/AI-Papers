@@ -10,7 +10,7 @@ class Value:
     def __add__(self, other):
 
         other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data, (self, other), "*")
+        out = Value(self.data + other.data, (self, other), "+")
 
         def _backward():
             self.grad  += out.grad * 1
@@ -22,7 +22,7 @@ class Value:
     def __mul__(self, other):
 
         other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data, (self, other), "*")
+        out = Value(self.data * other.data, (self, other), "*")
 
         def _backward():
             self.grad += out.grad * other.data
