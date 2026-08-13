@@ -31,6 +31,14 @@ class Value:
         out._backward = _backward
         return out
 
+    def __exp__(self, other):
+
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data ** other.data, (self, other), "**")
+
+        def _backward():
+            self.grad += out.grad * other ( )
+
     def backward(self):
         topo = []
         visited = set()
