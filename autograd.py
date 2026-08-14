@@ -7,6 +7,15 @@ class Value:
         self._op = _op
         self._backward = lambda : None
 
+    def __neg__(self):
+        return self * -1
+
+    def __sub__(self, other):
+        return self + (-other)
+
+    def __rsub__(self, other):
+        return other + (-self)
+
     def __add__(self, other):
 
         other = other if isinstance(other, Value) else Value(other)
@@ -31,13 +40,16 @@ class Value:
         out._backward = _backward
         return out
 
-    def __exp__(self, other):
+    def __pow__(self, other):
 
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data ** other.data, (self, other), "**")
+        assert isinstance(other, (int, float))
+        out = Value(self.data ** other, (self,), f"{other}")
 
         def _backward():
-            self.grad += out.grad * other ( )
+            self.grad += out.grad * (other * (self.data ** (other - 1)))
+
+        out._backward = _backward
+        return out
 
     def backward(self):
         topo = []
@@ -57,13 +69,7 @@ class Value:
             node._backward()
 
 
-a = Value(2.0)
-b = Value(-3.0)
-c = a + b
-d = a * b
-e = c * d
-
-e.backward()
-
-print(a.grad)  # should be -3.0
-print(b.grad)  # should be -8.0
+x = Value(3.0)
+y = x ** 2
+y.backward()
+print(x.grad)
